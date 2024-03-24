@@ -17,7 +17,7 @@ public:
     size_t ReadabelBytes() const; //返回可读字节数
     size_t PrependableBytes() const; //返回预备字节数
 
-    const char * Peek() const; //返回缓冲区起始地址
+    const char * Peek() const; //返回缓冲区开始可读地址
     void EnsureWritable(size_t len); //确保可写的长度
     void HasWritten(size_t len); //写入len个字节，移动写入位置
 

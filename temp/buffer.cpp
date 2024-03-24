@@ -23,7 +23,7 @@ const char *Buffer::Peek() const{
 // 确保可写的长度
 void Buffer::EnsureWritable(size_t len){
     if(WritableBytes()<len){
-        MakeSpace_(len);
+        MakeSpace_(len);//如果不够要扩充缓冲区，对应到后面readfd
     }
     assert(WritableBytes()>=len);
 }
@@ -48,7 +48,7 @@ void Buffer::RetrieveUntil(const char *end){
 //取出所有数据，buffer归0，读写下标归0
 void Buffer::RetrieveAll(){
     bzero(&buffer_[0],buffer_.size());
-    readPos_=writePos_=0;
+    readPos_=writePos_=0; //vector 一般都不能删除值，都是用覆盖，所以直接下标操作
 }
 
 //用字符串返回所有数据并清0
@@ -59,7 +59,7 @@ std::string Buffer::RetrieveAllToStr(){
 }
 
 //写指针的位置
-const char *Buffer::BeginWriteConst(){
+const char *Buffer::BeginWriteConst() const{
     return &buffer_[writePos_];
 }
 char *Buffer::BeginWrite(){
@@ -74,13 +74,69 @@ void Buffer::Append(const char * str, size_t len){
     HasWritten(len);//移动写下标
 }
 void Buffer::Append(const std::string & str){
-
+    Append(str.c_str(),str.size());
+}
+// 万能指针处理方式
+void Buffer::Append(const void * data, size_t len){
+    Append(static_cast<const char*>(data), len);
+}
+// 把buff对象的读下表开始的位置的数据加到buffer中
+void Buffer::Append(const Buffer & buff){
+    Append(buff.Peek(),buff.ReadabelBytes());
 }
 
+//从fd读数据
+ssize_t Buffer::ReadFd(int fd, int * Errno){
+    char buff[65535]; //放多余数据的栈
+    struc iovec iov[2];
+    size_t writable=WritableBytes();
+    iov[0].iov_base=BeginWrite(); //第一个读入buffer的地方，如果读不满就不用第二个队列勒
+    iov[0].iov_len=writable;
+    iov[1].iov_base=BeginWrite();
+    iov[1].iov_len=sizeof(buff);
+
+    ssize_t len=readv(fd,iov,2);
+    if(len<0){
+        *Errno=errno;
+    }else if(static_cast<size_t>(len)<=writable){
+        writePos_+=len; //读不满缓冲区
+    }else{
+        writePos_=buffer_.size();//读满缓冲区勒
+        Append(buff,static_cast<size_t>(len)-writable);
+    }
+    return len;
+}
+
+//向fd写数据
+ssize_t Buffer::WriteFd(int fd, int * Errno){
+    ssize_t len=write(fd,Peek(),ReadabelBytes());
+    if(len<0){
+        *Errno=errno;
+        return len;
+    }
+    Retrieve(len);//读了的数据要消除
+    return len;
+}
+
+char * Buffer::BeginPtr_(){
+    return &buffer_[0];
+}
+const char * Buffer::BeginPtr_(){
+    return &buffer_[0];
+}
+
+
+// 主要用来读取数据时vector不够来扩充vector
 void Buffer::MakeSpace_(size_t len){
     if(WritableBytes()+PrependableBytes()<len){
-        buffer_.resize(writePos_+len+1);
-    }else
-    
+        buffer_.resize(writePos_+len+1); //如果后面可写的部分和前面已经读完的部分加起来还不够那只有扩充vector勒
+    }else{//如果够，就是要把前面的接到后面来
+            //大错特错，vector怎么接？只有把还需要读复制到前面去
+        size_t readabel=ReadabelBytes();
+        std::copy(BeginPtr_()+readPos_,BeginPtr_()+writePos_,BeginPtr_());
+        readPos_=0;
+        writePos_=readabel;
+        assert(readabel==ReadabelBytes())
+    }
 }
 
