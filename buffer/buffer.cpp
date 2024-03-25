@@ -88,7 +88,7 @@ void Buffer::Append(const Buffer & buff){
 //从fd读数据
 ssize_t Buffer::ReadFd(int fd, int * Errno){
     char buff[65535]; //放多余数据的栈
-    struc iovec iov[2];
+    struct iovec iov[2];
     size_t writable=WritableBytes();
     iov[0].iov_base=BeginWrite(); //第一个读入buffer的地方，如果读不满就不用第二个队列勒
     iov[0].iov_len=writable;
