@@ -27,10 +27,10 @@ private:
     ~SqlConnPool(){ClosePool();}
     
     int MAX_CONN_;
-    std::queue<MYSQL *> connQue_;
+    std::queue<MYSQL* > connQue_;
     std::mutex mtx_;
     sem_t semId_;
-}
+};
 
 class SqlConnRAII{
 public:
@@ -47,6 +47,6 @@ public:
 private:
     MYSQL *sql_;
     SqlConnPool connpool_;
-}
+};
 
 #endif

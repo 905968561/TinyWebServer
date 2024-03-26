@@ -7,7 +7,7 @@ size_t Buffer::WritableBytes() const{
     return buffer_.size()-writePos_;
 }
 // 返回可读字节数
-size_t Buffer::ReadabelBytes() const{
+size_t Buffer::ReadableBytes() const{
     return writePos_-readPos_;
 }
 // 返回预备字节数
@@ -35,7 +35,7 @@ void  Buffer::HasWritten(size_t len){
 
 // 移动写下标
 void Buffer::Retrieve(size_t len){
-    assert(len<=ReadabelBytes());
+    assert(len<=ReadableBytes());
     readPos_+=len;
 }
 
@@ -53,7 +53,7 @@ void Buffer::RetrieveAll(){
 
 //用字符串返回所有数据并清0
 std::string Buffer::RetrieveAllToStr(){
-    std::string str(Peek(),ReadabelBytes());
+    std::string str(Peek(),ReadableBytes());
     RetrieveAll();
     return str;
 }
@@ -82,7 +82,7 @@ void Buffer::Append(const void * data, size_t len){
 }
 // 把buff对象的读下表开始的位置的数据加到buffer中
 void Buffer::Append(const Buffer & buff){
-    Append(buff.Peek(),buff.ReadabelBytes());
+    Append(buff.Peek(),buff.ReadableBytes());
 }
 
 //从fd读数据
@@ -109,7 +109,7 @@ ssize_t Buffer::ReadFd(int fd, int * Errno){
 
 //向fd写数据
 ssize_t Buffer::WriteFd(int fd, int * Errno){
-    ssize_t len=write(fd,Peek(),ReadabelBytes());
+    ssize_t len=write(fd,Peek(),ReadableBytes());
     if(len<0){
         *Errno=errno;
         return len;
@@ -121,7 +121,7 @@ ssize_t Buffer::WriteFd(int fd, int * Errno){
 char * Buffer::BeginPtr_(){
     return &buffer_[0];
 }
-const char * Buffer::BeginPtr_(){
+const char * Buffer::BeginPtr_() const{
     return &buffer_[0];
 }
 
@@ -132,11 +132,11 @@ void Buffer::MakeSpace_(size_t len){
         buffer_.resize(writePos_+len+1); //如果后面可写的部分和前面已经读完的部分加起来还不够那只有扩充vector勒
     }else{//如果够，就是要把前面的接到后面来
             //大错特错，vector怎么接？只有把还需要读复制到前面去
-        size_t readabel=ReadabelBytes();
+        size_t readabel=ReadableBytes();
         std::copy(BeginPtr_()+readPos_,BeginPtr_()+writePos_,BeginPtr_());
         readPos_=0;
         writePos_=readabel;
-        assert(readabel==ReadabelBytes())
+        assert(readabel==ReadableBytes());
     }
 }
 

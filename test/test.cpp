@@ -40,7 +40,7 @@ void TestThreadPool() {
     Log::Instance()->init(0, "./testThreadpool", ".log", 5000);
     ThreadPool threadpool(6);
     for(int i = 0; i < 18; i++) {
-        threadpool.AddTask(std::bind(ThreadLogTask, i % 4, i * 10000));
+        threadpool.AddTask(std::bind(ThreadLogTask, i % 4, i * 10000)); //bind 只是进行一个转发，另外在进行参数匹配
     }
     getchar();
 }

@@ -9,6 +9,7 @@ using namespace std;
 
 template<typename T>
 class BlockQueue{
+public:
     explicit BlockQueue(size_t maxsize=1000);
     ~BlockQueue();
     bool empty();

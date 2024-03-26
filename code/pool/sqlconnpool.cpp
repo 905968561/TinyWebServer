@@ -54,7 +54,7 @@ void SqlConnPool::FreeConn(MYSQL * conn){
 }
 
 void SqlConnPool::ClosePool(){
-    lock_guard<mutex> locker(mtx);
+    lock_guard<mutex> locker(mtx_);
     while(!connQue_.empty()){ //释放连接池中的连接
         auto conn=connQue_.front();
         connQue_.pop();
@@ -64,6 +64,6 @@ void SqlConnPool::ClosePool(){
 }
 
 int SqlConnPool::GetFreeConnCount(){
-    lock_guard<mutex> locker(mtx);
+    lock_guard<mutex> locker(mtx_);
     return connQue_.size();
 }

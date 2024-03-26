@@ -36,12 +36,12 @@ Log* Log::Instance(){
 }
 
 void Log::FlushLogThread(){
-    Log::Instance->AsyncWrite_(); //异步写日志的方法
+    Log::Instance()->AsyncWrite_(); //异步写日志的方法
 }
 
 //写线程的真正执行函数
 void Log::AsyncWrite_(){
-    String str ="";
+    string str ="";
     while(deque_->pop(str)){
         lock_guard<mutex> locker(mtx_);
         fputs(str.c_str(),fp_);
@@ -90,6 +90,7 @@ void Log::init(int level,const char* path, const char* suffix, int maxQueCapacit
     }//初始化完毕，阻塞队列初始化，写线程初始化，buffer清空，fp打开对应文件并正确命名
 }
 
+
 void Log::write(int level,const char * format,...){
     struct timeval now={0,0};
     gettimeofday(&now,nullptr);
@@ -119,7 +120,7 @@ void Log::write(int level,const char * format,...){
         flush(); //清空文件缓冲区和队列的缓冲区
         fclose(fp_);
         fp_=fopen(newFile,'a');//重新打开目标文件
-        assert(fp!=nullptr);
+        assert(fp_!=nullptr);
     }
 
     //向buffer当中写日志，等异步写线程来写，或者是直接写进文件
@@ -141,7 +142,7 @@ void Log::write(int level,const char * format,...){
         buff_.Append("\n\0",2); //添加末尾
 
         if(isAsync_ && deque_ && !deque_->full()){//异步方式（把缓冲区数据一次督导阻塞队列，等写线程写）
-            deque_->push_back(buff_.RetrieveAllToStr);
+            deque_->push_back(buff_.RetrieveAllToStr());
         }else{//同步
             fputs(buff_.Peek(),fp_); //直到读到字符结束符\0
         }

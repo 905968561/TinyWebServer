@@ -6,15 +6,15 @@
 #include <sys/uio.h> //readv
 #include <vector> //readv
 #include <atomic>
-#include <assert.h>
+#include <cassert>
 
 class Buffer{
 public:
-    Buffer(int initBuffSize = 1024); //定义缓冲区大小
+    explicit Buffer(int initBuffSize = 1024); //定义缓冲区大小
     ~Buffer()=default; //析构函数
 
     size_t WritableBytes() const; //返回可写字节数
-    size_t ReadabelBytes() const; //返回可读字节数
+    size_t ReadableBytes() const; //返回可读字节数
     size_t PrependableBytes() const; //返回预备字节数
 
     const char * Peek() const; //返回缓冲区开始可读地址
@@ -52,4 +52,4 @@ private:
     
 };
 
-#endif;
+#endif
