@@ -58,6 +58,7 @@ void Log::init(int level,const char* path, const char* suffix, int maxQueCapacit
         if(!deque_){//阻塞队列不存在就初始化一个
             unique_ptr<BlockQueue<string>> newQue(new BlockQueue<string>);
             deque_=move(newQue);//move移交控制权
+            // ！！！如果不移交控制权，那么离开作用域之后会直接销毁，这样移交控制权之后全看deque_他自己销毁了
             unique_ptr<std::thread> newThread(new thread(FlushLogThread));//新建线程的时候就绑定方法了
             writeThread_=move(newThread);
         }
