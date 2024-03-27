@@ -37,7 +37,7 @@ public:
     SqlConnRAII(MYSQL **sql,SqlConnPool * connpool){
         assert(connpool);
         *sql=connpool->GetConn();
-        sql_=*sql;
+        sql_=*sql; //这里的*时解引用 不是指针符号
         connpool_=connpool;
     }
 
