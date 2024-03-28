@@ -79,7 +79,7 @@ void Log::init(int level,const char* path, const char* suffix, int maxQueCapacit
         buff_.RetrieveAll(); //buffer清空
         if(fp_){// fp_清空
             flush();
-            fclose();
+            fclose(fp_);
         }
         fp_=fopen(fileName,"a");
         if(fp_==nullptr){
@@ -119,7 +119,7 @@ void Log::write(int level,const char * format,...){
         locker.lock();
         flush(); //清空文件缓冲区和队列的缓冲区
         fclose(fp_);
-        fp_=fopen(newFile,'a');//重新打开目标文件
+        fp_=fopen(newFile,"a");//重新打开目标文件
         assert(fp_!=nullptr);
     }
 
