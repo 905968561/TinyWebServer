@@ -86,6 +86,10 @@ char *HttpResponse::File() {
     return mmFile_;
 }
 
+size_t HttpResponse::FileLen() const {
+    return mmFileStat_.st_size;
+}
+
 void HttpResponse::ErrorHtml_() {
     // 如果是404，403就返回错误信息
     if(CODE_PATH.count(code_)==1){
