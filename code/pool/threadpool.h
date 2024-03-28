@@ -16,7 +16,7 @@ public:
     explicit ThreadPool(int threadCount=8):pool_(std::make_shared<Pool>()){//这里就是一个右值的传递，显示申请了一个右值引用再传递给pool
         assert(threadCount>0);
         for (int i = 0; i < threadCount; i++)
-        {
+        {   //通过detach建立多个线程，保证线程池一直运行
             std::thread([this](){
                 std::unique_lock<std::mutex> locker(pool_->mtx_);
                 while(true){
@@ -24,7 +24,7 @@ public:
                         auto task=std::move(pool_->tasks.front());
                         pool_->tasks.pop();
                         locker.unlock(); //这里任务已经取出来了，所以要放开锁，让其他线程去取任务了
-                        task();
+                        task();//这里只要把this指针传入进来就可以全局运行task
                         locker.lock();//任务执行完了，现在又要去取任务了，所以这里的临界资源其实是连接任务
                     }else if(pool_->isClosed){//和后面析构函数对应，但关闭的时候线程直接break。
                         break;
@@ -45,7 +45,7 @@ public:
     }
 
     template<typename T>
-    void addTask(T&& task){
+    void AddTask(T&& task){
         std::unique_lock<std::mutex> locker(pool_->mtx_);
         pool_->tasks.emplace(std::forward<T>(task));
         //forward 完美转发，保持了task的右值属性，这里使用emplace，直接就用右值传递，不用再内存中多申请一块内存了

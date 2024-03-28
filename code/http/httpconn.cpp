@@ -20,10 +20,10 @@ HttpConn::~HttpConn() {
 }
 
 void HttpConn::init(int sockFd, const int &addr) {
-    assert(fd > 0);
+    assert(sockFd > 0);
     userCount++;
     addr_ = addr;
-    fd_ = fd;
+    fd_ = sockFd;
     writeBuff_.RetrieveAll();
     readBuff_.RetrieveAll();
     isClose_ = false;
