@@ -34,7 +34,7 @@ private:
 
 class SqlConnRAII{
 public:
-    SqlConnRAII(MYSQL **sql,SqlConnPool * connpool){
+    SqlConnRAII(MYSQL **sql,SqlConnPool * connpool) {
         assert(connpool);
         *sql=connpool->GetConn();
         sql_=*sql; //这里的*时解引用 不是指针符号
@@ -46,7 +46,7 @@ public:
     }
 private:
     MYSQL *sql_;
-    SqlConnPool connpool_;
+    SqlConnPool * connpool_;
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include<httprequest.h>
+#include "httprequest.h"
 using namespace std;
 
 const unordered_set<string> HttpRequest::DEFAULT_HTML{
@@ -153,7 +153,7 @@ void HttpRequest::ParseFromUrlencoded_() {
         char ch=body_[i];
         switch (ch) {
             case '=':   // 遇到等号就要把前面的key保留下来
-                key=body_.substr(i,i-j);
+                key=body_.substr(j,i-j);
                 j=i+1;
                 break;
             case '+':
@@ -193,7 +193,7 @@ bool HttpRequest::UserVerify(const std::string &name, const std::string &pwd, bo
     bool flag=false;
     unsigned int j=0;
     char order[256]={0};
-    MYSQL_FILED * fields= nullptr;
+    MYSQL_FIELD * fields= nullptr;
     MYSQL_RES *res= nullptr;
 
     if(!isLogin){flag=true;}
@@ -260,7 +260,7 @@ std::string HttpRequest::version() const {
 }
 
 std::string HttpRequest::GetPost(const char *key) const {
-    assert(key != "");
+    assert(key != nullptr);
     if(post_.count(key)!=0){
         return post_.find(key)->second;
     }

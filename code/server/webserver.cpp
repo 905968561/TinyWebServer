@@ -289,3 +289,9 @@ bool WebServer::InitSocket_() {
     LOG_INFO("Server port:%d", port_);
     return true;
 }
+
+// 设置非阻塞
+int WebServer::SetFdNonblock(int fd) {
+    assert(fd > 0);
+    return fcntl(fd, F_SETFL, fcntl(fd, F_GETFD, 0) | O_NONBLOCK);
+}

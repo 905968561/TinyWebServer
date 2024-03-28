@@ -41,7 +41,7 @@ MYSQL *SqlConnPool::GetConn(){
     sem_wait(&semId_);
     lock_guard<mutex> locker(mtx_);
     conn=connQue_.front();
-    connQue.pop();
+    connQue_.pop();
     return conn;
 }
 

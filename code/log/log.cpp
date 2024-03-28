@@ -83,7 +83,7 @@ void Log::init(int level,const char* path, const char* suffix, int maxQueCapacit
         }
         fp_=fopen(fileName,"a");
         if(fp_==nullptr){
-            mkdir(fileName,0777); //不存在就生成
+            mkdir(path_,0777); //不存在就生成
             fp_=fopen(fileName,"a");
         }
         assert(fp_!=nullptr);

@@ -45,7 +45,7 @@ int HttpConn::GetFd() const {
     return fd_;
 }
 
-int HttpConn::GetAddr() const {
+sockaddr_in HttpConn::GetAddr() const  const {
     return addr_;
 }
 
